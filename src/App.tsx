@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Filter, Check, ArrowUpDown, LayoutGrid, CalendarDays, Archive } from 'lucide-react';
+import { Plus, Filter, Check, ArrowUpDown, LayoutGrid, CalendarDays, Archive, Timer } from 'lucide-react';
 import { Button } from './components/ui/Button';
 import { cn } from './lib/utils';
 import { Board } from './components/Board';
@@ -33,6 +33,9 @@ function App() {
 
   // Archive State
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
+
+  // Timer State
+  const [isTimerVisible, setIsTimerVisible] = useState(false);
 
   const {
     tasks,
@@ -353,6 +356,18 @@ function App() {
                   <CalendarDays className="w-4 h-4" />
                 </button>
               </div>
+
+              {/* Timer Toggle */}
+              <button
+                onClick={() => setIsTimerVisible(!isTimerVisible)}
+                className={cn(
+                  "p-1.5 rounded-md transition-all ml-2 border border-stone-200",
+                  isTimerVisible ? "bg-white text-rose-500 shadow-sm" : "bg-stone-100 text-stone-400 hover:text-stone-600"
+                )}
+                title="Toggle Timer"
+              >
+                <Timer className="w-4 h-4" />
+              </button>
             </div>
 
             {/* Right Side: Add Button */}
@@ -390,7 +405,12 @@ function App() {
         )}
       </main>
 
-      <PomodoroTimer />
+
+
+      <PomodoroTimer
+        className={isTimerVisible ? "" : "hidden"}
+        onClose={() => setIsTimerVisible(false)}
+      />
       <UndoToast
         message="Task deleted"
         isVisible={showUndoToast}
@@ -398,15 +418,17 @@ function App() {
         onClose={closeUndoToast}
       />
 
-      {isArchiveOpen && (
-        <ArchiveModal
-          tasks={archivedTasks}
-          tags={tags}
-          onRestore={restoreArchivedTask}
-          onDeleteForever={deleteTaskForever}
-          onClose={() => setIsArchiveOpen(false)}
-        />
-      )}
+      {
+        isArchiveOpen && (
+          <ArchiveModal
+            tasks={archivedTasks}
+            tags={tags}
+            onRestore={restoreArchivedTask}
+            onDeleteForever={deleteTaskForever}
+            onClose={() => setIsArchiveOpen(false)}
+          />
+        )
+      }
       <NewTaskModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

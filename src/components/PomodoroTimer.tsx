@@ -1,11 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Play, Pause, RotateCcw, Coffee, Brain } from 'lucide-react';
+import { Play, Pause, RotateCcw, Coffee, Brain, X } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { Button } from './ui/Button';
 
 type TimerMode = 'focus' | 'break';
 
-export function PomodoroTimer() {
+interface PomodoroTimerProps {
+    onClose?: () => void;
+    className?: string;
+}
+
+export function PomodoroTimer({ onClose, className }: PomodoroTimerProps) {
     const [mode, setMode] = useState<TimerMode>('focus');
     const [timeLeft, setTimeLeft] = useState(25 * 60);
     const [isRunning, setIsRunning] = useState(false);
@@ -38,7 +43,10 @@ export function PomodoroTimer() {
     const toggleTimer = () => setIsRunning(!isRunning);
 
     return (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 p-4 bg-white rounded-2xl shadow-xl border border-stone-100 w-48 transition-all hover:scale-105">
+        <div className={cn(
+            "fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 p-4 bg-white rounded-2xl shadow-xl border border-stone-100 w-48 transition-all hover:scale-105",
+            className
+        )}>
             <div className="flex w-full justify-between items-center mb-2">
                 <span className={cn(
                     "text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-1",
@@ -47,13 +55,24 @@ export function PomodoroTimer() {
                     {mode === 'focus' ? <Brain className="w-3 h-3" /> : <Coffee className="w-3 h-3" />}
                     {mode === 'focus' ? 'Focus' : 'Break'}
                 </span>
-                <button
-                    onClick={() => resetTimer(mode)}
-                    className="text-stone-400 hover:text-stone-600 transition-colors p-1"
-                    title="Reset Timer"
-                >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={() => resetTimer(mode)}
+                        className="text-stone-400 hover:text-stone-600 transition-colors p-1"
+                        title="Reset Timer"
+                    >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                    </button>
+                    {onClose && (
+                        <button
+                            onClick={onClose}
+                            className="text-stone-400 hover:text-stone-600 transition-colors p-1"
+                            title="Close Timer"
+                        >
+                            <X className="w-3.5 h-3.5" />
+                        </button>
+                    )}
+                </div>
             </div>
 
             <div className="text-4xl font-mono font-bold text-stone-800 tracking-tighter tabular-nums">
