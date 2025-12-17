@@ -1,5 +1,6 @@
 export type TaskStatus = 'todo' | 'in-progress' | 'done';
 export type TaskPriority = 'high' | 'medium' | 'low';
+export type RepeatFrequency = 'none' | 'daily' | 'weekly' | 'weekdays';
 
 export interface Tag {
     id: string;
@@ -23,6 +24,9 @@ export interface Task {
     priority: TaskPriority;
     subtasks: Subtask[];
     createdAt: number;
+    createdAt: number;
+    isArchived?: boolean;
+    repeat?: 'none' | 'daily' | 'weekly' | 'weekdays';
 }
 
 export type ColumnType = {

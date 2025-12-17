@@ -1,7 +1,7 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Trash2, Clock, CheckCircle, Circle, Flag } from 'lucide-react';
+import { Trash2, Clock, CheckCircle, Circle, Flag, Archive, Repeat } from 'lucide-react';
 import { type Task, type Tag } from '../types';
 import { cn } from '../lib/utils';
 import { format } from 'date-fns';
@@ -13,9 +13,11 @@ interface TaskCardProps {
     onClick?: (task: Task) => void;
     onDoubleClick?: (task: Task) => void;
     onToggleSubtask?: (taskId: string, subtaskId: string) => void;
+    onArchive?: (id: string) => void;
+    isOverlay?: boolean;
 }
 
-export function TaskCard({ task, tags = [], onDelete, onClick, onDoubleClick, onToggleSubtask }: TaskCardProps) {
+export function TaskCard({ task, tags = [], onDelete, onClick, onDoubleClick, onToggleSubtask, onArchive, isOverlay }: TaskCardProps) {
     const taskTag = tags.find(t => t.id === task.tagId);
     const {
         attributes,
@@ -59,7 +61,8 @@ export function TaskCard({ task, tags = [], onDelete, onClick, onDoubleClick, on
                 onDoubleClick?.(task);
             }}
             className={cn(
-                "bg-white p-4 rounded-xl shadow-card hover:shadow-float transition-shadow cursor-grab active:cursor-grabbing group relative border border-transparent hover:border-stone-100",
+                "bg-white p-4 rounded-xl shadow-card transition-shadow group relative border border-transparent hover:border-stone-100",
+                isOverlay ? "cursor-grabbing shadow-float scale-105 rotate-2 z-50 ring-2 ring-stone-900/10" : "hover:shadow-float cursor-grab active:cursor-grabbing",
                 "flex flex-col gap-2"
             )}
         >
@@ -123,22 +126,44 @@ export function TaskCard({ task, tags = [], onDelete, onClick, onDoubleClick, on
             )}
 
             <div className="flex items-center justify-between mt-auto">
-                {task.deadline ? (
+                {task.deadline && !isNaN(new Date(task.deadline).getTime()) ? (
                     <div className="flex items-center gap-1 text-xs text-stone-400">
                         <Clock className="w-3 h-3" />
                         <span>{format(new Date(task.deadline), 'MMM d, HH:mm')}</span>
                     </div>
                 ) : <div />}
 
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete(task.id);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 text-stone-400 hover:text-red-500 rounded hover:bg-red-50"
-                >
-                    <Trash2 className="w-4 h-4" />
-                </button>
+                {task.repeat && task.repeat !== 'none' && (
+                    <div className="flex items-center gap-1 text-xs text-stone-400" title={`Repeats: ${task.repeat}`}>
+                        <Repeat className="w-3 h-3" />
+                        <span className="capitalize">{task.repeat}</span>
+                    </div>
+                )}
+
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {task.status === 'done' && onArchive && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onArchive(task.id);
+                            }}
+                            className="p-1.5 text-stone-400 hover:text-blue-500 rounded hover:bg-blue-50"
+                            title="Archive"
+                        >
+                            <Archive className="w-4 h-4" />
+                        </button>
+                    )}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(task.id);
+                        }}
+                        className="p-1.5 text-stone-400 hover:text-red-500 rounded hover:bg-red-50"
+                        title="Delete"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                </div>
             </div>
         </div>
     );

@@ -12,7 +12,7 @@ import {
     subMonths,
     isToday
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, Clock, Flag, CheckCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Flag } from 'lucide-react';
 import { type Task, type Tag } from '../types';
 import { cn } from '../lib/utils';
 

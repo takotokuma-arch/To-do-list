@@ -3,12 +3,13 @@ import { useEffect, useState } from 'react';
 import { cn } from '../lib/utils';
 
 interface UndoToastProps {
+    message?: string;
     isVisible: boolean;
     onUndo: () => void;
     onClose: () => void;
 }
 
-export function UndoToast({ isVisible, onUndo, onClose }: UndoToastProps) {
+export function UndoToast({ message = "Task deleted", isVisible, onUndo, onClose }: UndoToastProps) {
     const [shouldRender, setShouldRender] = useState(isVisible);
 
     useEffect(() => {
@@ -27,7 +28,7 @@ export function UndoToast({ isVisible, onUndo, onClose }: UndoToastProps) {
                 isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0 pointer-events-none"
             )}
         >
-            <span className="text-sm font-medium">Task deleted</span>
+            <span className="text-sm font-medium">{message}</span>
             <button
                 onClick={onUndo}
                 className="text-sm font-bold text-amber-500 hover:text-amber-400 flex items-center gap-1"
