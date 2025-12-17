@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { format, addDays, nextSunday, addHours, startOfToday, isSameDay } from 'date-fns';
+import { format, addDays, nextSunday, addHours } from 'date-fns';
 import { Modal } from './ui/Modal';
 import { Input } from './ui/Input';
 import { Button } from './ui/Button';

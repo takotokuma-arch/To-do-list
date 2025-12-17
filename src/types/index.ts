@@ -24,7 +24,6 @@ export interface Task {
     priority: TaskPriority;
     subtasks: Subtask[];
     createdAt: number;
-    createdAt: number;
     isArchived?: boolean;
     repeat?: 'none' | 'daily' | 'weekly' | 'weekdays';
 }
