@@ -10,18 +10,22 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { useMemo, useState } from 'react';
-import { type ColumnType, type Task } from '../types';
+import { type ColumnType, type Task, type Tag } from '../types';
 import { Column } from './Column';
 import { TaskCard } from './TaskCard';
 import { createPortal } from 'react-dom';
+import confetti from 'canvas-confetti';
 
 interface BoardProps {
     tasks: Task[];
+    tags: Tag[];
     setTasks: React.Dispatch<React.SetStateAction<Task[]>>; // Allow Board to update state directly for DnD
     onDeleteTask: (id: string) => void;
+    onTaskDoubleClick?: (task: Task) => void;
+    onToggleSubtask?: (taskId: string, subtaskId: string) => void;
 }
 
-export function Board({ tasks, setTasks, onDeleteTask }: BoardProps) {
+export function Board({ tasks, tags, setTasks, onDeleteTask, onTaskDoubleClick, onToggleSubtask }: BoardProps) {
     const [activeTask, setActiveTask] = useState<Task | null>(null);
 
     const columns: ColumnType[] = useMemo(
@@ -91,6 +95,8 @@ export function Board({ tasks, setTasks, onDeleteTask }: BoardProps) {
             });
         }
 
+
+
         // Dropping a Task over a Column
         if (isActiveTask && isOverColumn) {
             setTasks((tasks) => {
@@ -100,6 +106,16 @@ export function Board({ tasks, setTasks, onDeleteTask }: BoardProps) {
                 if (tasks[activeIndex].status !== newStatus) {
                     const newTasks = [...tasks];
                     newTasks[activeIndex] = { ...newTasks[activeIndex], status: newStatus };
+
+                    // Trigger confetti if moving to Done
+                    if (newStatus === 'done') {
+                        confetti({
+                            particleCount: 100,
+                            spread: 70,
+                            origin: { y: 0.6 }
+                        });
+                    }
+
                     return arrayMove(newTasks, activeIndex, activeIndex); // Just status update
                 }
                 return tasks;
@@ -128,7 +144,11 @@ export function Board({ tasks, setTasks, onDeleteTask }: BoardProps) {
                         key={col.id}
                         column={col}
                         tasks={tasksByColumn[col.id as keyof typeof tasksByColumn]}
-                        onDeleteTask={onDeleteTask}
+                        tags={tags}
+
+                        onDelete={onDeleteTask}
+                        onTaskClick={onTaskDoubleClick}
+                        onToggleSubtask={onToggleSubtask}
                     />
                 ))}
             </div>
@@ -138,6 +158,7 @@ export function Board({ tasks, setTasks, onDeleteTask }: BoardProps) {
                     {activeTask && (
                         <TaskCard
                             task={activeTask}
+                            tags={tags}
                             onDelete={onDeleteTask}
                         />
                     )}

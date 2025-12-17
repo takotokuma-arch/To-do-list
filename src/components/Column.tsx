@@ -1,16 +1,18 @@
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { useMemo } from 'react';
-import { type ColumnType, type Task } from '../types';
+import { type ColumnType, type Task, type Tag } from '../types';
 import { TaskCard } from './TaskCard';
 
 interface ColumnProps {
     column: ColumnType;
     tasks: Task[];
-    onDeleteTask: (id: string) => void;
+    tags: Tag[];
+    onDelete: (id: string) => void;
     onTaskClick?: (task: Task) => void;
+    onToggleSubtask?: (taskId: string, subtaskId: string) => void;
 }
 
-export function Column({ column, tasks, onDeleteTask, onTaskClick }: ColumnProps) {
+export function Column({ column, tasks, tags, onDelete, onTaskClick, onToggleSubtask }: ColumnProps) {
     const tasksIds = useMemo(() => tasks.map((t) => t.id), [tasks]);
 
     const { setNodeRef } = useSortable({
@@ -40,8 +42,10 @@ export function Column({ column, tasks, onDeleteTask, onTaskClick }: ColumnProps
                         <TaskCard
                             key={task.id}
                             task={task}
-                            onDelete={onDeleteTask}
-                            onClick={onTaskClick}
+                            tags={tags}
+                            onDelete={onDelete}
+                            onDoubleClick={onTaskClick}
+                            onToggleSubtask={onToggleSubtask}
                         />
                     ))}
                 </SortableContext>
